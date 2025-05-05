@@ -1,73 +1,124 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kalkulator Keuntungan Saham</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        max-width: 400px;
-        margin: 40px auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Keuntungan Saham</title>
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css');
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #495057;
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      color: #495057;
+    }
+
+    .result {
+      font-weight: bold;
+      color: #198754;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    button {
+      background-color: #0d6efd;
+      color: white;
+      border: none;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0b5ed7;
+    }
+    input, button, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .result {
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h2>Kalkulator Keuntungan Saham</h2>
+  <label>Jumlah Lot</label>
+  <input type="number" id="lots" placeholder="Contoh: 5">
+
+  <label>Harga Beli per Lembar</label>
+  <input type="number" id="buyPrice" placeholder="Contoh: 370">
+
+  <label>Harga Jual per Lembar</label>
+  <input type="number" id="sellPrice" placeholder="Contoh: 755">
+
+  <label>Mode Perhitungan</label>
+  <select id="mode">
+    <option value="sederhana">Sederhana (faktor 0.94)</option>
+    <option value="detail">Detail (fee & pajak dihitung)</option>
+  </select>
+
+  <button onclick="calculateProfit()">Hitung Keuntungan</button>
+
+  <p class="result" id="result"></p>
+
+  <script>
+    function calculateProfit() {
+      const lots = parseInt(document.getElementById('lots').value);
+      const buyPrice = parseFloat(document.getElementById('buyPrice').value);
+      const sellPrice = parseFloat(document.getElementById('sellPrice').value);
+      const mode = document.getElementById('mode').value;
+
+      if (isNaN(lots) || isNaN(buyPrice) || isNaN(sellPrice)) {
+        document.getElementById('result').textContent = 'Harap isi semua kolom dengan benar.';
+        return;
       }
-      input,
-      button {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-      }
-      .result {
-        font-weight: bold;
-        color: green;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Kalkulator Keuntungan Saham</h2>
-    <label>Jumlah Lot</label>
-    <input type="number" id="lots" placeholder="Contoh: 5" />
 
-    <label>Harga Beli per Lembar</label>
-    <input type="number" id="buyPrice" placeholder="Contoh: 370" />
+      const shares = lots * 100;
 
-    <label>Harga Jual per Lembar</label>
-    <input type="number" id="sellPrice" placeholder="Contoh: 755" />
+      if (mode === 'sederhana') {
+        const grossProfit = shares * (sellPrice - buyPrice);
+        const netProfit = grossProfit * 0.94; // faktor efisiensi
+        document.getElementById('result').textContent =
+          `Estimasi Keuntungan Bersih (mode sederhana): Rp ${netProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
 
-    <button onclick="calculateProfit()">Hitung Keuntungan</button>
-
-    <p class="result" id="result"></p>
-
-    <script>
-      function calculateProfit() {
-        const lots = parseInt(document.getElementById("lots").value);
-        const buyPrice = parseFloat(document.getElementById("buyPrice").value);
-        const sellPrice = parseFloat(
-          document.getElementById("sellPrice").value
-        );
-
-        if (isNaN(lots) || isNaN(buyPrice) || isNaN(sellPrice)) {
-          document.getElementById("result").textContent =
-            "Harap isi semua kolom dengan benar.";
-          return;
-        }
-
-        const shares = lots * 100;
+      } else if (mode === 'detail') {
         const totalBuy = shares * buyPrice;
         const totalSell = shares * sellPrice;
 
-        const grossProfit = totalSell - totalBuy;
-        const estimatedFees = totalSell * 0.005;
-        const netProfit = grossProfit - estimatedFees;
+        const feeBuy = totalBuy * 0.0015;
+        const feeSell = totalSell * 0.0025;
+        const tax = totalSell * 0.001;
+        const materai = totalSell > 10000000 ? 10000 : totalSell > 5000000 ? 5000 : totalSell > 250000 ? 3000 : 0;
 
-        document.getElementById(
-          "result"
-        ).textContent = `Keuntungan Bersih: Rp ${netProfit
-          .toFixed(2)
-          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+        const totalCost = totalBuy + feeBuy;
+        const totalRevenue = totalSell - feeSell - tax - materai;
+        const netProfit = totalRevenue - totalCost;
+
+        document.getElementById('result').textContent =
+          `Keuntungan Bersih (mode detail): Rp ${netProfit.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\n` +
+          `(Termasuk fee beli: Rp ${feeBuy.toFixed(0)}, fee jual: Rp ${feeSell.toFixed(0)}, pajak: Rp ${tax.toFixed(0)}, materai: Rp ${materai})`;
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
+<footer style="text-align: center; margin-top: 20px; font-size: 0.9em; color: #555;">
+  Made with love by Enrique
+</footer>
 </html>
