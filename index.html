@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kalkulator Keuntungan Saham</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 400px;
+        margin: 40px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+      }
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+      }
+      .result {
+        font-weight: bold;
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Kalkulator Keuntungan Saham</h2>
+    <label>Jumlah Lot</label>
+    <input type="number" id="lots" placeholder="Contoh: 5" />
+
+    <label>Harga Beli per Lembar</label>
+    <input type="number" id="buyPrice" placeholder="Contoh: 370" />
+
+    <label>Harga Jual per Lembar</label>
+    <input type="number" id="sellPrice" placeholder="Contoh: 755" />
+
+    <button onclick="calculateProfit()">Hitung Keuntungan</button>
+
+    <p class="result" id="result"></p>
+
+    <script>
+      function calculateProfit() {
+        const lots = parseInt(document.getElementById("lots").value);
+        const buyPrice = parseFloat(document.getElementById("buyPrice").value);
+        const sellPrice = parseFloat(
+          document.getElementById("sellPrice").value
+        );
+
+        if (isNaN(lots) || isNaN(buyPrice) || isNaN(sellPrice)) {
+          document.getElementById("result").textContent =
+            "Harap isi semua kolom dengan benar.";
+          return;
+        }
+
+        const shares = lots * 100;
+        const totalBuy = shares * buyPrice;
+        const totalSell = shares * sellPrice;
+
+        const grossProfit = totalSell - totalBuy;
+        const estimatedFees = totalSell * 0.005;
+        const netProfit = grossProfit - estimatedFees;
+
+        document.getElementById(
+          "result"
+        ).textContent = `Keuntungan Bersih: Rp ${netProfit
+          .toFixed(2)
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+      }
+    </script>
+  </body>
+</html>
